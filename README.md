@@ -3,12 +3,12 @@
 provide a minimal client example that only requests a quote from an enclave. The server
 component that communicates with Intel's attestation service has been removed.
 
-# Intel&reg; Software Guard Extensions (SGX) Quote Generation Sample
+# Intel&reg; SGX Quote Generation Sample
 
 * [Introduction](#intro)
 * [What's New](#new)
 * [License](#license)
-* Building
+* [Building](#build)
   * [Linux*](#build-linux)
     * [Linux build notes](#build-linux-notes)
 * [Running (Quick-start)](#running-quick)
@@ -21,7 +21,43 @@ receiving the quote from the enclave, the client dumps it to the terminal. It co
 sent to Intel's Attestation Service (IAS) by another component.
 
 A docker-compose based development environment is provided, and is the recommended way
-to try this sample, as it has not been tested on other platforms.
+to try this sample, as it has not been tested on other platforms. See the Quickstart
+section just below to see how to try it.
+
+## <a name="quickstart"></a>Quickstart
+### Prerequisites
+You need [docker](https://docs.docker.com/engine/install/) and
+[docker-compose](https://docs.docker.com/compose/install/).
+
+The docker-based development environment assumes it is running on an SGX-enabled
+processor. If you are not sure whether your computer supports SGX, and/or how to enable
+it, see https://github.com/ayeks/SGX-hardware#test-sgx.
+
+Build the image:
+
+```shell
+$ docker-compose build
+```
+
+Generate a quote:
+
+```shell
+$ docker-compose up genquote
+sgx-quote-sample_aesm_1 is up-to-date
+Recreating sgx-quote-sample_genquote_1 ... done
+Attaching to sgx-quote-sample_genquote_1
+genquote_1  | report data: 7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d90690000000000000000000000000000000000000000000000000000000000000000
+genquote_1  |
+genquote_1  | Request body, ready to be sent to IAS (POST /attestation/v4/report)
+genquote_1  | See https://api.trustedservices.intel.com/documents/sgx-attestation-api-spec.pdf
+genquote_1  |
+genquote_1  | {
+genquote_1  | "isvEnclaveQuote":"AgAAAFsLAAALAAoAAAAAAAEjRWeJq83vASNFZ4mrze/nPeZ4W/vP4mEeti+oAsg/CRH//wECAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAHAAAAAAAAAI4majJcsMYGPgaI1YXpV+0qJaVeODg7VV/FmIfczWtGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC9ccY4Dvd8VBfostHOLUtlBLn0GOUEk0JEDP/yRD2VvQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/g7Flf/H8U7ktwYFIodZd/C1LH6PWdyhK3dIAEm2QaQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqAIAAImGmadWF2xZtqXZLNs6/hIYSeXVIxvozVid1GROXP1l89ZkyQolLvBLHFTB+9wrwBuj1X6muARcxPCw8rM+Ns5Ri53adGtmOVZPbP9LlNhENz7qpjc7nlIiPskHgfRx0KAj5GJYi+ZIA9a8P4aP7AZ41JlvFLZHZ56yAqyeJ413mR9UmoUzlb2F6/r++dfERrDAOSFic1Mx5Ev+VXBC3/zjesF4IKu8JdlpZW7Sdlb5nPzVaTRASHmMZXwdd56VUJDzV3n9Ht6VcsNm/A1s0+iCKC6yBSculsqQ6KOd7IpQeh8OwjsAQe8k8zHYOxNm/2yY5+GnBNk/wzuEZCYwlVhIGQxKUApcn1d6zPuPomw9dFC3394YOFwGnLFoN2NcT9c+O+Nwqzd/AcqSIWgBAADK5CPStIQJYVQej2gwbsEEx/MHizfR2fWDfgiwfwNUKcYaMiVthJn7FzvARhCJpSsFwX316ajqxoCFr8Ie8YFUz17LePwK6BPBMUggpaKbo30EjufUGZ3sfkjo4o6YhNvJBqaeZbwdk5i9FsmWj0NrvvkppyEWygJrdh4Jzdw7qFYGRvqhg+5K+pM+7wym5VI2/uSBeUKt4FCUNQMAwFIn/I4z4Bo8mrrsOxngEfVSCgBFJkCzafEoMieyYDeR+7xua7mAgaUUhmEk7wcLv/v8CykLKBWWiygtQRnvVNFCE1SoEVGFLguqmSnikPW5uYzZxqNRynYrRdb4yq5+4QzZPcQnKwQBKMmoKbVZVTjlb9IWT7dKhyZh+HY8ymC/GMcHuf/qe4DrrzYuuQK9gDVLFjz/j3NB9OvOjgP/QGu+Lu3Htk5OjZuj81609x9f1Szk1IMuDc1sB7cTFE1nVPa4GHHcLrl6JdHd18OJXT9AWXcFYR4LI3UY",
+genquote_1  | "nonce":"4bdc950a45cc41a2f901edd437a37d6a"
+genquote_1  | }
+genquote_1  |
+sgx-quote-sample_genquote_1 exited with code 0
+```
 
 For complete information on remote attestation, see the
 [white paper](https://software.intel.com/en-us/articles/intel-software-guard-extensions-remote-attestation-end-to-end-example)

@@ -17,7 +17,7 @@ services:
       LD_LIBRARY_PATH: /opt/intel/sgx-aesm-service/aesm
     command: ./aesm_service --no-daemon
 
-  ra-client:
+  genquote:
     image: sgx_ra
     build:
       context: .

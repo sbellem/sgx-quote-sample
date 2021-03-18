@@ -449,7 +449,9 @@ int do_quote(sgx_enclave_id_t eid, config_t *config) {
   sgx_report_data_t report_data = {{0}};
   sgx_status_t sha_status;
   xstatus = enclave_set_report_data(eid, &sha_status, &report_data);
+  fprintf(stderr, "report data: ");
   print_hexstring(stderr, report_data.d, sizeof(report_data.d));
+  printf("\n\n");
 
   status = get_report(eid, &sgxrv, &report, &target_info, &report_data);
   if (status != SGX_SUCCESS) {
@@ -498,6 +500,11 @@ int do_quote(sgx_enclave_id_t eid, config_t *config) {
     return 1;
   }
 
+  printf(
+      "Request body, ready to be sent to IAS (POST /attestation/v4/report)\n");
+  printf("See "
+         "https://api.trustedservices.intel.com/documents/"
+         "sgx-attestation-api-spec.pdf\n\n");
   printf("{\n");
   printf("\"isvEnclaveQuote\":\"%s\"", b64quote);
   if (OPT_ISSET(flags, OPT_NONCE)) {
@@ -506,7 +513,7 @@ int do_quote(sgx_enclave_id_t eid, config_t *config) {
     printf("\"");
   }
 
-  printf("\n}\n");
+  printf("\n}\n\n");
 
 #ifdef SGX_HW_SIM
   fprintf(stderr, "WARNING! Built in h/w simulation mode. This quote will not "
