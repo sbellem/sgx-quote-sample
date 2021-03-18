@@ -17,28 +17,18 @@ services:
       LD_LIBRARY_PATH: /opt/intel/sgx-aesm-service/aesm
     command: ./aesm_service --no-daemon
 
-  ra.client:
+  ra-client:
     image: sgx_ra
     build:
       context: .
       dockerfile: Dockerfile
     depends_on:
       - aesm
-      - ra.server
     devices:
       - /dev/isgx
     volumes:
       - aesmd-socket:/var/run/aesmd
-    command: ./run-client --debug -n c9a1694e713024e4b10494c3698e26b4 ra.server
-
-  ra.server:
-    image: sgx_ra
-    build:
-      context: .
-      dockerfile: Dockerfile
-    volumes:
-      - ./bin:/usr/src/sgx-ra/bin
-    command: ./run-server --debug --mrsigner bd71c6380ef77c5417e8b2d1ce2d4b6504b9f418e5049342440cfff2443d95bd
+    command: ./run-client --debug -q
 
 volumes:
   aesmd-socket:

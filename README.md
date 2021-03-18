@@ -1,4 +1,9 @@
-# Intel&reg; Software Guard Extensions (SGX) Remote Attestation End-to-End Sample for EPID Attestations
+**NOTE**: Experimental work-in-progress repository based on Intel's original
+[sgx-ra-sample](https://github.com/intel/sgx-ra-sample) repository. The goal is to
+provide a minimal client example that only requests a quote from an enclave. The server
+component that communicates with Intel's attestation service has been removed.
+
+# Intel&reg; Software Guard Extensions (SGX) Quote Generation Sample
 
 * [Introduction](#intro)
 * [What's New](#new)
@@ -6,25 +11,24 @@
 * Building
   * [Linux*](#build-linux)
     * [Linux build notes](#build-linux-notes)
-  * [Windows*](#build-win)
 * [Running (Quick-start)](#running-quick)
 * [Running (Advanced)](#running-adv)
 * [Sample Output](#output)
 
 ## <a name="intro"></a>Introduction
+This code sample demonstrates a simple client requesting a quote from an enclave. Upon
+receiving the quote from the enclave, the client dumps it to the terminal. It could be
+sent to Intel's Attestation Service (IAS) by another component.
 
-This code sample demonstrates the procedures that must be followed when performing Remote Attestation for an Intel SGX enclave when using EPID attestations. The code sample includes both a sample ISV (independent software vendor) client (and its enclave) and ISV remote attestation server. It has been tested on the following platforms:
+A docker-compose based development environment is provided, and is the recommended way
+to try this sample, as it has not been tested on other platforms.
 
-**Linux**
- * Ubuntu 18.04
- * Centos* 7.4
+For complete information on remote attestation, see the
+[white paper](https://software.intel.com/en-us/articles/intel-software-guard-extensions-remote-attestation-end-to-end-example)
+on Intel's Developer Zone.
 
-**Microsoft* Windows**
- * Windows 10 64-bit
-
-For complete information on remote attestation, see the [white paper](https://software.intel.com/en-us/articles/intel-software-guard-extensions-remote-attestation-end-to-end-example) on Intel's Developer Zone.
-
-For more information on developing applications with Intel SGX, visit the [Intel SGX landing zone](https://software.intel.com/sgx/).
+For more information on developing applications with Intel SGX, visit the
+[Intel SGX landing zone](https://software.intel.com/sgx/).
 
 ## <a name="new"></a>What's New
 
@@ -127,56 +131,18 @@ The `configure` script will attempt to auto-detect your Intel SGX SDK directory,
 
 You can build the client for simulation mode using `--enable-sgx-simulation`. Note that Remote Attestation will fail for clients running in simulation mode, as this mode has no hardware protection.
 
-### <a name="build-win"></a>Windows
-
-#### Prerequisites
-
-* Ensure you have the following:
-
-  * Windows 10 64-bit
-  * Microsoft* Visual Studio 2017 (Professional edition or better)
-  * [Intel SGX SDK and Platform Software for Windows](https://software.intel.com/en-us/sgx-sdk/download) v2.7 or later
-
-* Install OpenSSL 1.1.0 for Windows. The [Win64 OpenSSL v1.1.0 package from Shining Light Productions](https://slproweb.com/products/Win32OpenSSL.html) is recommended. **Select the option to copy the DLL's to your Windows system directory.**
-
-* Download [applink.c](https://github.com/openssl/openssl/blob/master/ms/applink.c) from GitHub and install it to OpenSSL's `include\openssl` directory.
-
-#### Configure and Compile
-
-* Open the Solution file `remote-attestation-sample.sln` in the `vs/` subdirectory.
-
-* Set the configuration to "Debug" and the platform to "x64".
-
-* Configure the client build
-
-  * Open the **client** project properties
-
-  * Navigate to "C/C++ -> General" and edit "Additional Include Directories" to include your OpenSSL include path. This is pre-set to `C:\OpenSSL-Win64\include` which is the default location for the recommended OpenSSL package for Windows.
-
-  * Navigate to "Linker -> General" and edit "Additional Library Directories" to `C:\OpenSSL-Win64\lib`
-
-* Configure the *server* build
-
-  * Open the **sp** project properties
-
-  * Navigate to "Linker -> Additional Library Directories" and edit "Additional Library Directories" to include your OpenSSL library path. This is pre-set to `C:\OpenSSL-Win64\lib\VC\` which is the default install location.
-
-* Build the Solution. The binaries will be written to `vs\x64\Debug`
-
-## <a name="running-quick"></a>Running the Sample (Quick Start Guide)
-
-By default, the server listens on port 7777 and the client connects to localhost. The server will make use of system proxy settings when contacting IAS.
-
-The client and server use a very simplistic network protocol with _no error handling and no encryption_. Messages are sent using base 16 encoding (printed hex strings) for easy reading and interpretation. The intent here is to demonstrate the RA procedures and the modified Sigma protocol, not model a real-world application. _It's assumed that a real ISV would integrate RA flows into their existing service infrastructure (e.g. a REST API implemented over a TLS session)._
 
 ### Enclave Verification Policy
 
-The build process automatically generates a file named ```policy``` on Linux (```policy.cmd``` on
-Windows) which contains the enclave verification policy settings. The server validates the enclave
-by examining the contents of the report, and ensuring the following attributes in the report match
-those specified in the policy file:
+The build process automatically generates a file named ```policy``` on Linux which
+contains the enclave verification policy settings. The server validates the enclave
+by examining the contents of the report, and ensuring the following attributes in the
+report match those specified in the policy file:
 
  * The enclave's MRSIGNER value (this is a SHA256 hash generated from the signing key)
+
+ * The enclave's MRENCLAVE value (this is a SHA256 hash generated from the enclave's
+   measurement)
 
  * The Product ID number ('''ProdID''' in `Enclave.config.xml`)
 
@@ -199,23 +165,18 @@ provider!''
 
 ### Linux
 
-Two wrapper scripts, `run-client` and `run-server` are provided for convenience. These are Bourne shell scripts that do the following:
+A wrapper script, `run-client` is provided for convenience. This is a Bourne shell
+script that does the following:
 
 * Set LD_LIBRARY_PATH
 * Parse the `settings` and `policy` files (which are sourced as shell scripts)
-* Execute the client or server application with the corresponding command-line options
+* Execute the client application with the corresponding command-line options
 
 You can pass command-line options to the underlying executables via the wrapper scripts.
 
 To execute:
 
 * Edit the `settings` file
-
-* Run the server:
-
-  ```
-  ./run-server [ options ] [ port ]
-  ```
 
 * Run the client:
 
@@ -228,38 +189,6 @@ in `Enclave_config.xml` and the signed enclave, `Enclave.signed.so`. In order to
 the policy validation functions, you can edit the parameters in this file and
 restart the server. Your changes will be lost, however, if you do a
 `make clean`.
-
-### Windows
-
-Two wrapper scripts, `run-client.cmd` and `run-server.cmd` are provided for convenience. These are Windows CMD-style batch files that do the following:
-
-* Parse the `settings.cmd` and `policy.cmd` files (which are called as batch files)
-
-* Execute the client.exe or sp.exe applications with the corresponding command-line options.
-
-You can pass command-line options to the underlying executables via the wrapper scripts. Note that it expects UNIX-style syntax (dashes), not Windows-style (slashes).
-
-To execute:
-
-* Edit the `settings.cmd` file
-
-* Run the server:
-
-  ```
-  run-server [ options ] [ port ]
-  ```
-
-* Run the client:
-
-  ```
-  run-client [ options ] [ host[:port] ]
-  ```
-
-The `policy.cmd` file is automatically generated for you from the Enclave metadata
-in `Enclave_config.xml and the signed enclave, `Enclave.signed.dll`. In order to test
-the policy validation functions, you can edit the parameters in this file and
-restart the server. Your changes will be lost, however, if you clean or rebuild
-the project.
 
 ## <a name="running-adv"></a>Running the Sample (Advanced Options)
 
@@ -318,113 +247,6 @@ The `-q` option will generate and print a quote instead of performing remote att
 
 The `-p` and `-P` options let you override the service provider's public key for debugging and testing purposes. This key is normally hardcoded into the enclave to ensure it only attests to the expected service provider.
 
-### Server
-
-```
-usage: sp [ options ] [ port ]
-Required:
-  -A, --ias-signing-cafile=FILE
-                           Specify the IAS Report Signing CA file.
-
-  -N, --mrsigner=HEXSTRING
-                           Specify the MRSIGNER value of encalves that
-                           are allowed to attest. Enclaves signed by
-                           other signing keys are rejected.
-
-  -R, --isv-product-id=INT
-                           Specify the ISV Product Id for the service.
-                           Only Enclaves built with this Product Id
-                           will be accepted.
-
-  -V, --min-isv-svn=INT
-                           The minimum ISV SVN that the service provider
-                           will accept. Enclaves with a lower ISV SVN
-                           are rejected.
-
-Required (one of):
-  -S, --spid-file=FILE     Set the SPID from a file containg a 32-byte
-                           ASCII hex string.
-
-  -s, --spid=HEXSTRING     Set the SPID from a 32-byte ASCII hex string.
-
-Required (one of):
-  -I, --ias-pri-api-key-file=FILE
-                           Set the IAS Primary Subscription Key from a
-                           file containing a 32-byte ASCII hex string.
-
-  -i, --ias-pri-api-key=HEXSTRING
-                           Set the IAS Primary Subscription Key from a
-                           32-byte ASCII hex string.
-
-Required (one of):
-
-  -J, --ias-sec-api-key-file=FILE
-                           Set the IAS Secondary Subscription Key from a
-                           file containing a 32-byte ASCII hex string.
-
-  -j, --ias-sec-api-key=HEXSTRING
-                           Set the IAS Secondary Subscription Key from a
-                           32-byte ASCII hex string.
-
-Optional:
-  -B, --ca-bundle-file=FILE
-                           Use the CA certificate bundle at FILE (default:
-                           /etc/ssl/certs/ca-certificates.crt)
-
-  -D, --no-debug-enclave   Reject Debug-mode enclaves (default: accept)
-
-  -G, --list-agents        List available user agent names for --user-agent
-
-  -K, --service-key-file=FILE
-                           The private key file for the service in PEM
-                           format (default: use hardcoded key). The
-                           client must be given the corresponding public
-                           key. Can't combine with --key.
-
-  -P, --production         Query the production IAS server instead of dev.
-
-  -X, --strict-trust-mode  Don't trust enclaves that receive a
-                           CONFIGURATION_NEEDED response from IAS
-                           (default: trust)
-
-  -d, --debug              Print debug information to stderr.
-
-  -g, --user-agent=NAME    Use NAME as the user agent for contacting IAS.
-
-  -k, --key=HEXSTRING      The private key as a hex string. See --key-file
-                           for notes. Can't combine with --key-file.
-
-  -l, --linkable           Request a linkable quote (default: unlinkable).
-
-  -p, --proxy=PROXYURL     Use the proxy server at PROXYURL when contacting
-                           IAS. Can't combine with --no-proxy
-
-  -r, --api-version=N      Use version N of the IAS API (default: 4)
-
-  -v, --verbose            Be verbose. Print message structure details and
-                           the results of intermediate operations to stderr.
-
-  -x, --no-proxy           Do not use a proxy (force a direct connection),
-                           overriding environment.
-
-  -z  --stdio              Read from stdin and write to stdout instead of
-                           running as a network server.
-```
-
-You set the user agent with `-g` (a list of supported agents can be obtained from `-G`). On Linux, this is one of either **wget** or **libcurl** (unless the latter is disabled in the build configuration). On Windows, **winhttp** is the only agent.
-
-By default, the server uses protocol version 4 when communicating with IAS. This can be changed with `-r`. Versions 1 and 2 have been deprecated.
-
-You can override the service provider private key with `-k` or `-K`. As with the client, this key would normally be hardcoded into the server to prevent it from handling unauthorized clients.
-
-You can force the server to use a proxy when communicating with IAS via `-p`, or to use a direct connection via `-x`.
-
-As with the client, the server can be run in interactive mode via `-z`, accepting input from stdin and writing to stdout. This makes it possible to copy and paste output from the client to the server, and visa-versa.
-
-By default, the server trusts enclaves that result in a CONFIGURATION_NEEDED response from IAS. Enable strict mode with `-X` to mark these enclaves as untrusted. This is a policy decision: the service provider should decide whether or not to trust the enclave in this circumstance.
-
-## <a name="output"></a>Sample output
-
 ### Client
 
 ```
@@ -439,22 +261,4 @@ d0cf09ac6230516154c174906b2937476beaf1641d386157559ecbc95330c407442f5169c0adc13e
 
 ---- Enclave Trust Status from Service Provider ----------------------------
 Enclave TRUSTED
-```
-
-### Server
-
-```
-Listening for connections on port 7777
-Waiting for a client to connect...
-Connection from 127.0.0.1
-Waiting for msg0||msg1
-
----- Copy/Paste Msg2 Below to Client ---------------------------------------
-e1c252d589daf123e18a20047d48d00dcc36312bba903b56ff62e3282a7991e4c355bc2c62427e003c7830b9f648cae480105fd065866b41fd0255038a9f54d6928a6b0e3cddad56eb3badaa3b63f71f00000100b5d1f9b84fe9e25690b220ad89465ba4d569b3eccbc26d0842666b466e745f8b5079ec3591be5c6ff6fe185d97244c06ffda6f1cb23f600e4b6a04b141df8e2f3c43bbcd7fc375b372c6044ccd414e3300000000
-----------------------------------------------------------------------------
-Waiting for msg3
-
----- Copy/Paste Msg4 Below to Client ---------------------------------------
-010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-----------------------------------------------------------------------------
 ```

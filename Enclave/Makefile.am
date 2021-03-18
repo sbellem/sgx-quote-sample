@@ -72,7 +72,7 @@ LIBS=
 ## Additional files to remove with 'make clean'. This list needs
 ## to include your edger8r genreated files.
 
-CLEANFILES+= $(ENCLAVE)_t.c $(ENCLAVE)_t.h 
+CLEANFILES+= $(ENCLAVE)_t.c $(ENCLAVE)_t.h
 
 
 ## Put your sources here. Don't forget to list the _t.c and _t.h 
@@ -119,4 +119,3 @@ SGX_EXTRA_TLIBS=-lsgx_tkey_exchange -lsgx_tcxx
 ##
 ## enclave_LDFLAGS = @SGX_ENCLAVE_LDFLAGS@
 ##
-

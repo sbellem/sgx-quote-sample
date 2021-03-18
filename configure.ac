@@ -17,17 +17,17 @@ AC_ARG_WITH([openssldir],
 	[AC_HELP_STRING([--with-openssl=DIR], [Specify location of OpenSSL package])],
 	[openssl=$withval],[])
 
-AC_ARG_WITH([curldir],
-	[AC_HELP_STRING([--with-curl=DIR], [Specify location of curl package])],
-	[curl=$withval],[])
-
-AC_ARG_ENABLE([agent-libcurl],
-	[AC_HELP_STRING([--disable-agent-libcurl], [Disable the libcurl user agent])],
-	[], [enable_agent_libcurl=yes])
+dnl AC_ARG_WITH([curldir],
+dnl 	[AC_HELP_STRING([--with-curl=DIR], [Specify location of curl package])],
+dnl 	[curl=$withval],[])
+dnl 
+dnl AC_ARG_ENABLE([agent-libcurl],
+dnl 	[AC_HELP_STRING([--disable-agent-libcurl], [Disable the libcurl user agent])],
+dnl 	[], [enable_agent_libcurl=yes])
 
 dnl Are we building against SGX SDK 2.5 which required the bool type?
 dnl ----------------------------------------------------------------------
-AC_EGREP_HEADER([bool refresh_att_key], 
+AC_EGREP_HEADER([bool refresh_att_key],
 	[$SGXSDK/include/sgx_uae_service.h],
 	[
 		AC_DEFINE([UAE_SERVICE_HAS_BOOL], [1],
@@ -67,36 +67,36 @@ AS_IF([test "$openssl" != ""], [
 
 dnl Is libcurl available?
 dnl ----------------------------------------------------------------------
-AS_IF([test "$enable_agent_libcurl" = "yes"],[
-	old_LIBS="$LIBS"
-	AS_IF([test "$curl" != ""], [
-		old_CPPFLAGS="$CPPFLAGS"
-		old_LDFLAGS="$LDFLAGS"
-		LDFLAGS="$LDFLAGS -L${curl}/lib"
-		CPPFLAGS="$CPPFLAGS -I${curl}/include"
-	])
-	AC_CHECK_HEADER([curl/curl.h], [use_libcurl=1], [use_libcurl=0])
-	AS_IF([test "$use_libcurl" = "1"], [
-		AC_SEARCH_LIBS([curl_easy_init], [curl], [use_libcurl=1],
-			[use_libcurl=0])
-	])
-	AS_IF([test "$curl" != ""], [
-		LDFLAGS="$old_LDFLAGS"
-		CPPFLAGS="$old_CPPFLAGS"
-	])
-	LIBS="$old_LIBS"
-	AS_IF([test "$use_libcurl" = "1"],[
-		AC_DEFINE([AGENT_LIBCURL], [1], [Enable libcurl as a user agent])
-		AC_SUBST([AGENT_CURL_SRC], [agent_curl.cpp])
-		AS_IF([test "$curl" != ""],[
-			AC_SUBST([CURL_CPPFLAGS], [-I$curl/include])
-			AC_SUBST([CURL_LDFLAGS], [-L$curl/lib])
-			AC_SUBST([CURL_LIBDIR], [$curl/lib])
-		])
-		AC_SUBST([CURL_LIBS], [-lcurl])
-	])
-],[use_libcurl=0])
-AM_CONDITIONAL([AGENT_CURL], [test "$use_libcurl" = "1"])
+dnl AS_IF([test "$enable_agent_libcurl" = "yes"],[
+dnl 	old_LIBS="$LIBS"
+dnl 	AS_IF([test "$curl" != ""], [
+dnl 		old_CPPFLAGS="$CPPFLAGS"
+dnl 		old_LDFLAGS="$LDFLAGS"
+dnl 		LDFLAGS="$LDFLAGS -L${curl}/lib"
+dnl 		CPPFLAGS="$CPPFLAGS -I${curl}/include"
+dnl 	])
+dnl 	AC_CHECK_HEADER([curl/curl.h], [use_libcurl=1], [use_libcurl=0])
+dnl 	AS_IF([test "$use_libcurl" = "1"], [
+dnl 		AC_SEARCH_LIBS([curl_easy_init], [curl], [use_libcurl=1],
+dnl 			[use_libcurl=0])
+dnl 	])
+dnl 	AS_IF([test "$curl" != ""], [
+dnl 		LDFLAGS="$old_LDFLAGS"
+dnl 		CPPFLAGS="$old_CPPFLAGS"
+dnl 	])
+dnl 	LIBS="$old_LIBS"
+dnl 	AS_IF([test "$use_libcurl" = "1"],[
+dnl 		AC_DEFINE([AGENT_LIBCURL], [1], [Enable libcurl as a user agent])
+dnl 		AC_SUBST([AGENT_CURL_SRC], [agent_curl.cpp])
+dnl 		AS_IF([test "$curl" != ""],[
+dnl 			AC_SUBST([CURL_CPPFLAGS], [-I$curl/include])
+dnl 			AC_SUBST([CURL_LDFLAGS], [-L$curl/lib])
+dnl 			AC_SUBST([CURL_LIBDIR], [$curl/lib])
+dnl 		])
+dnl 		AC_SUBST([CURL_LIBS], [-lcurl])
+dnl 	])
+dnl ],[use_libcurl=0])
+dnl AM_CONDITIONAL([AGENT_CURL], [test "$use_libcurl" = "1"])
 
 dnl Find default CA bundle that works with OpenSSL apps, if possible. 
 dnl ----------------------------------------------------------------------
@@ -120,11 +120,9 @@ dnl Write our configuration
 dnl ----------------------------------------------------------------------
 AC_CONFIG_FILES([
 	sigstruct.sh
-	run-server:run.in
 	run-client:run.in
 	Makefile
 	Enclave/Makefile
-],[chmod -f 755 run-client run-server sigstruct.sh])
+],[chmod -f 755 run-client sigstruct.sh])
 
 AC_OUTPUT
-
