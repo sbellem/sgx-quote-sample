@@ -5,6 +5,7 @@ component that communicates with Intel's attestation service has been removed.
 
 # Intel&reg; SGX Quote Generation Sample
 
+<!--
 * [Introduction](#intro)
 * [What's New](#new)
 * [License](#license)
@@ -16,6 +17,7 @@ component that communicates with Intel's attestation service has been removed.
 * [Sample Output](#output)
 
 ## <a name="intro"></a>Introduction
+-->
 This code sample demonstrates a simple client requesting a quote from an enclave. Upon
 receiving the quote from the enclave, the client dumps it to the terminal. It could be
 sent to Intel's Attestation Service (IAS) by another component.
@@ -66,6 +68,7 @@ on Intel's Developer Zone.
 For more information on developing applications with Intel SGX, visit the
 [Intel SGX landing zone](https://software.intel.com/sgx/).
 
+<!--
 ## <a name="new"></a>What's New
 
 See the [full release history](CHANGES.md).
@@ -298,3 +301,4 @@ d0cf09ac6230516154c174906b2937476beaf1641d386157559ecbc95330c407442f5169c0adc13e
 ---- Enclave Trust Status from Service Provider ----------------------------
 Enclave TRUSTED
 ```
+-->
