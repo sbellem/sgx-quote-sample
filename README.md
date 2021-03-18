@@ -39,7 +39,8 @@ section just below to see how to try it.
   [Intel SGX Attestation Service Utilizing Enhanced Privacy ID (EPID)](https://api.portal.trustedservices.intel.com/).
 
 * Edit the `settings` file to add your `SPID`, `IAS_PRIMARY_SUBSCRIPTION_KEY`, and
-  `IAS_SECONDARY_SUBSCRIPTION_KEY`.
+  `IAS_SECONDARY_SUBSCRIPTION_KEY`. **DO NOT COMMIT changes for this file, as it will
+  contain secret data, namely your subscription keys.**
 
 Build the image:
 
