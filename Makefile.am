@@ -25,7 +25,7 @@ include $(top_srcdir)/build-aux/sgx_app.am
 ##   SGX_URTS_LIB
 ##   SGX_EDGER8R
 
-SUBDIRS = Enclave 
+SUBDIRS = Enclave
 
 ## Supply additional flags to edger8r here. 
 ##
@@ -48,7 +48,7 @@ Enclave/Enclave.signed.so:
 ## AM_CPPFLAGS += 
 ## AM_CFLAGS = 
 
-AM_CXXFLAGS = -std=c++11 
+AM_CXXFLAGS = -std=c++11
 
 AM_CPPFLAGS += -fno-builtin-memset @OPENSSL_CPPFLAGS@
 
@@ -56,14 +56,15 @@ AM_CPPFLAGS += -fno-builtin-memset @OPENSSL_CPPFLAGS@
 ## any edger8r generated files here.
 
 CLEANFILES = Enclave_u.c Enclave_u.h Enclave.edl Enclave.signed.so \
-	policy enclave_sigstruct_raw 
+	policy enclave_sigstruct_raw
 
 
 ## The build target
 
-server: sp
+#server: sp
 
-bin_PROGRAMS = client sp sigstruct
+#bin_PROGRAMS = client sp sigstruct
+bin_PROGRAMS = client sigstruct
 
 ## You can't use $(wildcard ...) with automake so all source files 
 ## have to be explicitly listed.
@@ -83,12 +84,12 @@ client_LDFLAGS= $(AM_LDFLAGS) @OPENSSL_LDFLAGS@
 
 ## sp
 
-sp_SOURCES = sp.cpp agent_wget.cpp iasrequest.cpp enclave_verify.c $(common)
-BUILT_SOURCES += policy
-EXTRA_sp_DEPENDENCIES = Enclave.signed.so
-if AGENT_CURL
-sp_SOURCES += agent_curl.cpp
-endif
+#sp_SOURCES = sp.cpp agent_wget.cpp iasrequest.cpp enclave_verify.c $(common)
+#BUILT_SOURCES += policy
+#EXTRA_sp_DEPENDENCIES = Enclave.signed.so
+#if AGENT_CURL
+#sp_SOURCES += agent_curl.cpp
+#endif
 
 ## sigstruct (helper app)
 
@@ -102,7 +103,7 @@ policy: sigstruct policy.in Enclave.signed.so
 		policy.in > policy
 	rm -f enclave_sigstruct_raw
 
-sp_LDFLAGS= $(AM_LDFLAGS) @OPENSSL_LDFLAGS@ @CURL_LDFLAGS@
+#sp_LDFLAGS= $(AM_LDFLAGS) @OPENSSL_LDFLAGS@ @CURL_LDFLAGS@
 sigstruct_LDFLAGS= $(AM_LDFLAGS) @OPENSSL_LDFLAGS@
 
 ## Library flags. At minimum, an Intel SGX application will need:
@@ -117,5 +118,4 @@ client_LDADD=-l$(SGX_URTS_LIB) -lsgx_ukey_exchange -lcrypto \
 
 sigstruct_LDADD=-lcrypto
 
-sp_LDADD=-lcrypto @CURL_LIBS@
-
+#sp_LDADD=-lcrypto @CURL_LIBS@

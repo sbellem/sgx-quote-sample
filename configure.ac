@@ -27,7 +27,7 @@ AC_ARG_ENABLE([agent-libcurl],
 
 dnl Are we building against SGX SDK 2.5 which required the bool type?
 dnl ----------------------------------------------------------------------
-AC_EGREP_HEADER([bool refresh_att_key], 
+AC_EGREP_HEADER([bool refresh_att_key],
 	[$SGXSDK/include/sgx_uae_service.h],
 	[
 		AC_DEFINE([UAE_SERVICE_HAS_BOOL], [1],
@@ -127,4 +127,3 @@ AC_CONFIG_FILES([
 ],[chmod -f 755 run-client run-server sigstruct.sh])
 
 AC_OUTPUT
-
