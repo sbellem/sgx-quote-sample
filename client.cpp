@@ -449,9 +449,6 @@ int do_quote(sgx_enclave_id_t eid, config_t *config) {
   sgx_report_data_t report_data = {{0}};
   sgx_status_t sha_status;
   xstatus = enclave_set_report_data(eid, &sha_status, &report_data);
-  fprintf(stderr, "report data: ");
-  print_hexstring(stderr, report_data.d, sizeof(report_data.d));
-  printf("\n\n");
 
   status = get_report(eid, &sgxrv, &report, &target_info, &report_data);
   if (status != SGX_SUCCESS) {
@@ -492,28 +489,37 @@ int do_quote(sgx_enclave_id_t eid, config_t *config) {
     return 1;
   }
 
-  /* Print our quote */
+  printf("\nMRENCLAVE: \t");
+  print_hexstring(stdout, &quote->report_body.mr_enclave,
+                  sizeof(sgx_measurement_t));
+  printf("\nMRSIGNER: \t");
+  print_hexstring(stdout, &quote->report_body.mr_signer,
+                  sizeof(sgx_measurement_t));
+  printf("\nReport Data: \t");
+  print_hexstring(stdout, &quote->report_body.report_data,
+                  sizeof(sgx_report_data_t));
+  printf("\n\n");
 
+  /* Print our quote */
   b64quote = base64_encode((char *)quote, sz);
   if (b64quote == NULL) {
     eprintf("Could not base64 encode quote\n");
     return 1;
   }
 
-  printf(
-      "Request body, ready to be sent to IAS (POST /attestation/v4/report)\n");
-  printf("See "
-         "https://api.trustedservices.intel.com/documents/"
-         "sgx-attestation-api-spec.pdf\n\n");
+  printf("Quote, ready to be sent to IAS (POST /attestation/v4/report):\n");
   printf("{\n");
-  printf("\"isvEnclaveQuote\":\"%s\"", b64quote);
+  printf("\t\"isvEnclaveQuote\":\"%s\"", b64quote);
   if (OPT_ISSET(flags, OPT_NONCE)) {
-    printf(",\n\"nonce\":\"");
+    printf(",\n\t\"nonce\":\"");
     print_hexstring(stdout, &config->nonce, 16);
     printf("\"");
   }
 
   printf("\n}\n\n");
+  printf("See "
+         "https://api.trustedservices.intel.com/documents/"
+         "sgx-attestation-api-spec.pdf\n");
 
 #ifdef SGX_HW_SIM
   fprintf(stderr, "WARNING! Built in h/w simulation mode. This quote will not "
