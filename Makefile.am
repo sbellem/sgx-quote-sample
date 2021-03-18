@@ -85,7 +85,7 @@ client_LDFLAGS= $(AM_LDFLAGS) @OPENSSL_LDFLAGS@
 ## sp
 
 #sp_SOURCES = sp.cpp agent_wget.cpp iasrequest.cpp enclave_verify.c $(common)
-#BUILT_SOURCES += policy
+BUILT_SOURCES += policy
 #EXTRA_sp_DEPENDENCIES = Enclave.signed.so
 #if AGENT_CURL
 #sp_SOURCES += agent_curl.cpp
