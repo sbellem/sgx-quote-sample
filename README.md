@@ -28,12 +28,18 @@ section just below to see how to try it.
 
 ## <a name="quickstart"></a>Quickstart
 ### Prerequisites
-You need [docker](https://docs.docker.com/engine/install/) and
-[docker-compose](https://docs.docker.com/compose/install/).
+* You need [docker](https://docs.docker.com/engine/install/) and
+  [docker-compose](https://docs.docker.com/compose/install/).
 
-The docker-based development environment assumes it is running on an SGX-enabled
-processor. If you are not sure whether your computer supports SGX, and/or how to enable
-it, see https://github.com/ayeks/SGX-hardware#test-sgx.
+* The docker-based development environment assumes it is running on an SGX-enabled
+  processor. If you are not sure whether your computer supports SGX, and/or how to
+  enable it, see https://github.com/ayeks/SGX-hardware#test-sgx.
+
+* Obtain an **Unlinkable** subscription key for the
+  [Intel SGX Attestation Service Utilizing Enhanced Privacy ID (EPID)](https://api.portal.trustedservices.intel.com/).
+
+* Edit the `settings` file to add your `SPID`, `IAS_PRIMARY_SUBSCRIPTION_KEY`, and
+  `IAS_SECONDARY_SUBSCRIPTION_KEY`.
 
 Build the image:
 
