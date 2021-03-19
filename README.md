@@ -79,6 +79,7 @@ The quote is printed out in a json-like format, which is ready to be sent to IAS
 verification. The API specifications for IAS is documented at
 https://api.trustedservices.intel.com/documents/sgx-attestation-api-spec.pdf.
 
+### Sending the quote to IAS
 Here's a simple example of sending out the quote to IAS for verification using Python's
 `requests` library:
 
@@ -120,6 +121,10 @@ The json response:
  'isvEnclaveQuoteBody': 'AgAAAFsLAAALAAoAAAAAAFOrdeScwC/lZP1RWReIG+hkvH3eqUYIQqw8ZooL4SSwCRH//wECAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAHAAAAAAAAAFq7qqXcBX0KHIKBXKUTymEHeNRA42fUL72KAd5cxo1UAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC9ccY4Dvd8VBfostHOLUtlBLn0GOUEk0JEDP/yRD2VvQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/g7Flf/H8U7ktwYFIodZd/C1LH6PWdyhK3dIAEm2QaQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'}
 ```
 
+#### Verifying the report authenticity
+TODO: check report signature, in response header
+
+#### Verifying the MRENCLAVE, and report data
 Getting the MRENCLAVE, MRSIGNER and report data out of the report requires to know
 the structure of a quote:
 
