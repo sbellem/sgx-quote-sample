@@ -98,6 +98,8 @@ headers = {
 res = requests.post(url, json=request_body, headers=headers)
 ```
 
+The json response:
+
 ```python
 >>> res.json()
 {'nonce': 'b516b8e1e63d4437930cb2ea56f1c451',
@@ -118,7 +120,66 @@ res = requests.post(url, json=request_body, headers=headers)
  'isvEnclaveQuoteBody': 'AgAAAFsLAAALAAoAAAAAAFOrdeScwC/lZP1RWReIG+hkvH3eqUYIQqw8ZooL4SSwCRH//wECAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAHAAAAAAAAAFq7qqXcBX0KHIKBXKUTymEHeNRA42fUL72KAd5cxo1UAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC9ccY4Dvd8VBfostHOLUtlBLn0GOUEk0JEDP/yRD2VvQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/g7Flf/H8U7ktwYFIodZd/C1LH6PWdyhK3dIAEm2QaQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'}
 ```
 
+Getting the MRENCLAVE, MRSIGNER and report data out of the report requires to know
+the structure of a quote:
 
+```C
+typedef struct _quote_t
+{
+    uint16_t            version;        /* 0   */
+    uint16_t            sign_type;      /* 2   */
+    sgx_epid_group_id_t epid_group_id;  /* 4   */
+    sgx_isv_svn_t       qe_svn;         /* 8   */
+    sgx_isv_svn_t       pce_svn;        /* 10  */
+    uint32_t            xeid;           /* 12  */
+    sgx_basename_t      basename;       /* 16  */
+    sgx_report_body_t   report_body;    /* 48  */
+    uint32_t            signature_len;  /* 432 */
+    uint8_t             signature[];    /* 436 */
+} sgx_quote_t;
+```
+
+The report body is the structure that contains the MRENCLAVE:
+
+```C
+typedef struct _report_body_t
+{
+    sgx_cpu_svn_t           cpu_svn;        /* (  0) Security Version of the CPU */
+    sgx_misc_select_t       misc_select;    /* ( 16) Which fields defined in SSA.MISC */
+    uint8_t                 reserved1[SGX_REPORT_BODY_RESERVED1_BYTES];  /* ( 20) */
+    sgx_isvext_prod_id_t    isv_ext_prod_id;/* ( 32) ISV assigned Extended Product ID */
+    sgx_attributes_t        attributes;     /* ( 48) Any special Capabilities the Enclave possess */
+    sgx_measurement_t       mr_enclave;     /* ( 64) The value of the enclave's ENCLAVE measurement */
+    uint8_t                 reserved2[SGX_REPORT_BODY_RESERVED2_BYTES];  /* ( 96) */
+    sgx_measurement_t       mr_signer;      /* (128) The value of the enclave's SIGNER measurement */
+    uint8_t                 reserved3[SGX_REPORT_BODY_RESERVED3_BYTES];  /* (160) */
+    sgx_config_id_t         config_id;      /* (192) CONFIGID */
+    sgx_prod_id_t           isv_prod_id;    /* (256) Product ID of the Enclave */
+    sgx_isv_svn_t           isv_svn;        /* (258) Security Version of the Enclave */
+    sgx_config_svn_t        config_svn;     /* (260) CONFIGSVN */
+    uint8_t                 reserved4[SGX_REPORT_BODY_RESERVED4_BYTES];  /* (262) */
+    sgx_isvfamily_id_t      isv_family_id;  /* (304) ISV assigned Family ID */
+    sgx_report_data_t       report_data;    /* (320) Data provided by the user */
+} sgx_report_body_t;
+```
+
+```python
+import base64
+import hashlib
+
+isv_enclave_quote_body = res.json()['isvEnclaveQuoteBody']
+report_body = base64.b64decode(isv_enclave_quote_body)[48:432]
+
+report_body[64:96].hex()    # mrenclave
+# 5abbaaa5dc057d0a1c82815ca513ca610778d440e367d42fbd8a01de5cc68d54
+
+report_body[320:384].hex()  # report data
+# 7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d90690000000000000000000000000000000000000000000000000000000000000000
+
+# The sha256 of 'Hello World!' is supposed to be in the report data ...
+report_body[320:384][:32].hex() == hashlib.sha256(b'Hello World!').hexdigest()
+# True
+```
 
 <!--
 ## <a name="new"></a>What's New
