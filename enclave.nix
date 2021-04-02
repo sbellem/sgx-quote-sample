@@ -1,13 +1,11 @@
 let
   sources = import ./nix/sources.nix;
   pkgs = import sources.nixpkgs { };
-  sgxsdk = import ./sgxsdk.nix { inherit sources; };
+  sgxsdk = /nix/store/znr7dg5bkv2kspcmqrak59hb88hcqv4k-sgxsdk;
 in
-#pkgs.mkShell {
 pkgs.stdenv.mkDerivation {
-#pkgs.stdenvNoCC.mkDerivation {
   inherit sgxsdk;
-  name = "sgx-ra";
+  name = "sgx-quote";
   src = ./.;
   #source $SGX_SDK/environment
   preConfigure = ''
@@ -25,42 +23,25 @@ pkgs.stdenv.mkDerivation {
     autoconf
     automake
     libtool
-    #ocaml
-    #ocamlPackages.ocamlbuild
     file
-    #cmake
-    #gnum4
     openssl
-    #gnumake
-    # FIXME For now, must get glibc from another nixpkgs revision.
-    # See https://github.com/intel/linux-sgx/issues/612
-    #glibc
-    #/nix/store/681354n3k44r8z90m35hm8945vsp95h1-glibc-2.27
-    #gcc8
-    #texinfo
-    #bison
-    #flex
-    #perl
-    #python3
     which
-    #git
   ];
 
-  #dontInstall = true;
   installPhase = ''
     runHook preInstall
 
     mkdir -p $out/bin
     cp Enclave/Enclave.so $out/bin/
     cp Enclave/Enclave.signed.so $out/bin/
-    cp mrsigner $out/bin
 
     runHook postInstall
   '';
+    #cp mrsigner $out/bin
   postInstall = ''
     $sgxsdk/sgxsdk/bin/x64/sgx_sign dump -cssfile enclave_sigstruct_raw -dumpfile /dev/null -enclave $out/bin/Enclave.signed.so
     cp enclave_sigstruct_raw $out/bin/
-    ./mrsigner enclave_sigstruct_raw > $out/bin/mrsigner.txt
     '';
+    #./mrsigner enclave_sigstruct_raw > $out/bin/mrsigner.txt
   dontFixup = true;
 }
