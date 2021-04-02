@@ -1,4 +1,4 @@
-FROM initc3/linux-sgx:2.12-ubuntu18.04
+FROM initc3/linux-sgx:2.13-ubuntu20.04
 
 RUN apt-get update && apt-get install -y \
                 autotools-dev \
@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
                 vim \
         && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /usr/src/sgx-ra
+WORKDIR /usr/src/sgx-quote
 
 ENV SGX_SDK /opt/sgxsdk
 ENV PATH $PATH:$SGX_SDK/bin:$SGX_SDK/bin/x64
