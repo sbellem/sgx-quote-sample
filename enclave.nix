@@ -6,7 +6,15 @@ in
 pkgs.stdenv.mkDerivation {
   inherit sgxsdk;
   name = "sgx-quote";
-  src = ./.;
+  #src = ./.;
+  src = pkgs.fetchFromGitHub {
+    owner = "sbellem";
+    repo = "sgx-quote-sample";
+    rev = "a8ae70430be1d5ad3dd2962032d435b543c3552b";
+    # Command to get the sha256 hash (note the --fetch-submodules arg):
+    # nix run -f '<nixpkgs>' nix-prefetch-github -c nix-prefetch-github --rev a8ae70430be1d5ad3dd2962032d435b543c3552b sbellem sgx-quote-sample
+    sha256 = "0d8czkfl0yk1d2d25d2siwxmkw22zx861xlcq30790mmq9ilph7m";
+  };
   #source $SGX_SDK/environment
   preConfigure = ''
     export SGX_SDK=$sgxsdk/sgxsdk
