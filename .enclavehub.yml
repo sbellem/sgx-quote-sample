@@ -3,10 +3,10 @@ enclaves:
   - name: sgx-quote
     build:
       builder: docker
-      builder_args:
-        - context_path: .
-        - file: nix.Dockerfile
-        - target: export-stage
+      build_kwargs:
+        context_path: .
+        file: nix.Dockerfile
+        target: export-stage
       output_dir: out
       enclave_file: Enclave.so
     enclave_config: Enclave/Enclave.config.xml
