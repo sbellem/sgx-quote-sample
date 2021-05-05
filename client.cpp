@@ -448,6 +448,10 @@ int do_quote(sgx_enclave_id_t eid, config_t *config) {
 
   sgx_report_data_t report_data = {{0}};
   sgx_status_t sha_status;
+
+  // TODO Put this in the get_report function as this must be done in enclave
+  // otherwise this code could be modified by the host such that the report data
+  // is tampered with.
   xstatus = enclave_set_report_data(eid, &sha_status, &report_data);
 
   status = get_report(eid, &sgxrv, &report, &target_info, &report_data);

@@ -140,8 +140,27 @@ sgx_status_t enclave_ra_get_key_hash(sgx_status_t *get_keys_ret,
 sgx_status_t enclave_set_report_data(sgx_report_data_t *report_data) {
   const uint8_t x[] = {0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20,
                        0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21};
+  int iterations = 100000000;
   sgx_status_t sha_ret;
-  sha_ret = sgx_sha256_msg(x, sizeof(x), (sgx_sha256_hash_t *)report_data);
+  sgx_sha256_hash_t intermediate_hash;
+  sha_ret =
+      sgx_sha256_msg(x, sizeof(x), (sgx_sha256_hash_t *)intermediate_hash);
+
+  for (int i = 1; i < iterations - 1; i++) {
+    sha_ret = sgx_sha256_msg((const uint8_t *)&intermediate_hash,
+                             sizeof(intermediate_hash),
+                             (sgx_sha256_hash_t *)intermediate_hash);
+  }
+
+  sha_ret = sgx_sha256_msg((const uint8_t *)&intermediate_hash,
+                           sizeof(intermediate_hash),
+                           (sgx_sha256_hash_t *)report_data);
+
+  // sha_ret = sgx_sha256_msg(x, sizeof(x), (sgx_sha256_hash_t *)report_data);
+  // sha_ret = sgx_sha256_msg((const uint8_t *)&report_data,
+  // sizeof(report_data),
+  //                         (sgx_sha256_hash_t *)report_data);
+
   return sha_ret;
 }
 

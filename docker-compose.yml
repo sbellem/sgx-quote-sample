@@ -28,7 +28,7 @@ services:
       - /dev/isgx
     volumes:
       - aesmd-socket:/var/run/aesmd
-      - ./.enclavehub/Enclave.signed.so:/usr/src/sgx-quote/Enclave.signed.so
+      #- ./.enclavehub/Enclave.signed.so:/usr/src/sgx-quote/Enclave.signed.so
       - ./.enclavehub.yml:/usr/src/sgx-quote/.enclavehub.yml
       - ./.enclavehub:/usr/src/sgx-quote/.enclavehub
     command: ./run-client --debug -q
